@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Designing Custom Agents — Specialized Personas for AI-Assisted Development</title>
+  <!-- Red Hat Design Tokens -->
+  <link href="https://cdn.jsdelivr.net/npm/@rhds/tokens@3.0.2/css/global.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* === RESET & BASE === */
+    :root { color-scheme: dark; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #000000;
+      --bg-secondary: #1f1f1f;
+      --bg-surface: #292929;
+      --text-primary: #ffffff;
+      --text-secondary: #c7c7c7;
+      --text-muted: #a3a3a3;
+      --accent: #ee0000;
+      --accent-dark: #a60000;
+      --accent-light: #f56e6e;
+      --tag-border: #383838;
+      --icon-filter: brightness(0) invert(1);
+      --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
+
+      --font-display: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+      --font-body: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);
+      --font-mono: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      overflow: hidden;
+    }
+
+    /* === ICON STYLES === */
+    .rh-icon {
+      height: 48px; width: 48px;
+      filter: var(--icon-filter);
+      vertical-align: middle;
+    }
+    .rh-icon.small  { height: 24px; width: 24px; }
+    .rh-icon.medium { height: 48px; width: 48px; }
+    .rh-icon.large  { height: 64px; width: 64px; }
+    .rh-icon.xl     { height: 96px; width: 96px; }
+    .rh-icon.accent { filter: var(--icon-filter-accent); }
+
+    /* === LOGO === */
+    .rh-logo { height: 28px; width: auto; }
+    .rh-logo.small { height: 20px; }
+    .rh-logo.large { height: 40px; }
+
+    /* === TAG / PILL === */
+    .tag {
+      display: inline-block;
+      padding: var(--rh-space-xs, 4px) var(--rh-space-md, 16px);
+      border: var(--rh-border-width-sm, 1px) solid var(--tag-border);
+      border-radius: var(--rh-border-radius-pill, 64px);
+      font-family: var(--font-mono);
+      font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .tag.accent {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* === SLIDE CONTAINER === */
+    .deck { width: 100vw; height: 100vh; position: relative; }
+
+    .slide {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      width: 100vw;
+      height: 100vh;
+      padding: var(--rh-space-4xl, 80px) var(--rh-space-3xl, 64px);
+      position: relative;
+      overflow: hidden;
+    }
+    .slide.active { display: flex; }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: -20%; right: -10%;
+      width: 60%; height: 60%;
+      background: radial-gradient(ellipse, rgba(238,0,0,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .slide > * { position: relative; z-index: 1; }
+
+    /* === BREADCRUMB === */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: var(--rh-space-sm, 8px);
+      font-family: var(--font-mono);
+      font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+      color: var(--text-muted);
+      margin-bottom: var(--rh-space-lg, 24px);
+    }
+
+    /* === LABEL === */
+    .slide-label {
+      font-family: var(--font-mono);
+      font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: var(--rh-space-lg, 24px);
+    }
+
+    /* === HEADLINES === */
+    h1 {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: var(--rh-font-size-heading-2xl, 3rem);
+      line-height: 1.1;
+      color: var(--text-primary);
+      margin-bottom: var(--rh-space-lg, 24px);
+      max-width: 900px;
+    }
+    h1 .accent { color: var(--accent); }
+    h1 .accent-italic { color: var(--accent); font-style: italic; }
+
+    h2 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--rh-font-size-heading-lg, 2rem);
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin-bottom: var(--rh-space-xl, 32px);
+      max-width: 850px;
+    }
+    h2 .accent { color: var(--accent); }
+
+    h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--rh-font-size-heading-md, 1.5rem);
+      color: var(--text-primary);
+      margin-bottom: var(--rh-space-md, 16px);
+    }
+
+    /* === BODY TEXT === */
+    .subtitle {
+      font-family: var(--font-body);
+      font-size: var(--rh-font-size-body-text-xl, 1.25rem);
+      color: var(--text-muted);
+      max-width: 700px;
+      line-height: 1.6;
+      margin-bottom: var(--rh-space-xl, 32px);
+    }
+
+    .body-text {
+      font-family: var(--font-body);
+      font-size: var(--rh-font-size-body-text-lg, 1.125rem);
+      color: var(--text-secondary);
+      max-width: 750px;
+      line-height: 1.7;
+    }
+
+    .attribution {
+      font-family: var(--font-body);
+      font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+      color: var(--text-muted);
+      margin-top: auto;
+      padding-top: var(--rh-space-xl, 32px);
+    }
+
+    .source {
+      font-family: var(--font-mono);
+      font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+      color: var(--text-muted);
+      margin-top: auto;
+      padding-top: var(--rh-space-lg, 24px);
+      opacity: 0.7;
+    }
+
+    /* === TAGS ROW === */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--rh-space-sm, 8px);
+      margin-bottom: var(--rh-space-xl, 32px);
+    }
+
+    /* === BIG NUMBER === */
+    .big-number {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 6rem;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: var(--rh-space-md, 16px);
+    }
+    .big-number-context {
+      font-family: var(--font-body);
+      font-size: var(--rh-font-size-body-text-xl, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 600px;
+      line-height: 1.5;
+    }
+
+    /* === COMPARISON === */
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--rh-space-2xl, 48px);
+      max-width: 1000px;
+      width: 100%;
+    }
+    .compare-col {
+      padding: var(--rh-space-xl, 32px);
+      border-radius: var(--rh-border-radius-default, 3px);
+      background: var(--bg-secondary);
+      border-top: var(--rh-border-width-lg, 3px) solid var(--tag-border);
+    }
+    .compare-col.highlight {
+      border-top-color: var(--accent);
+      background: rgba(238,0,0,0.04);
+    }
+    .compare-col h3 {
+      display: flex;
+      align-items: center;
+      gap: var(--rh-space-sm, 8px);
+    }
+    .compare-item {
+      font-family: var(--font-body);
+      font-size: var(--rh-font-size-body-text-md, 1rem);
+      color: var(--text-secondary);
+      line-height: 1.7;
+      padding: var(--rh-space-sm, 8px) 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .compare-item:last-child { border-bottom: none; }
+    .compare-item strong { color: var(--text-primary); font-weight: 500; }
+
+    /* === ARCHITECTURE DIAGRAM === */
+    .arch-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: var(--rh-space-lg, 24px);
+      max-width: 950px;
+      width: 100%;
+    }
+    .arch-row {
+      display: flex;
+      gap: var(--rh-space-md, 16px);
+      align-items: stretch;
+    }
+    .arch-box {
+      flex: 1;
+      padding: var(--rh-space-lg, 24px);
+      background: rgba(41,41,41,0.8);
+      border: 1px solid var(--tag-border);
+      border-radius: var(--rh-border-radius-default, 3px);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--rh-space-xs, 4px);
+    }
+    .arch-box.accent-border {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(238,0,0,0.1);
+    }
+    .arch-box .label {
+      font-family: var(--font-mono);
+      font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+    .arch-box .sublabel {
+      font-family: var(--font-mono);
+      font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+      color: var(--text-muted);
+    }
+    .arch-arrow {
+      text-align: center;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      padding: var(--rh-space-xs, 4px) 0;
+    }
+    .arch-group-label {
+      font-family: var(--font-mono);
+      font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: var(--rh-space-xs, 4px);
+    }
+
+    /* === FEATURE GRID === */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--rh-space-lg, 24px);
+      max-width: 900px;
+      width: 100%;
+    }
+    .feature-card {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--rh-space-md, 16px);
+      padding: var(--rh-space-lg, 24px);
+      background: var(--bg-secondary);
+      border-radius: var(--rh-border-radius-default, 3px);
+      border-left: var(--rh-border-width-md, 2px) solid var(--accent);
+    }
+    .feature-card .feature-text h4 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--rh-font-size-heading-sm, 1.25rem);
+      color: var(--text-primary);
+      margin-bottom: var(--rh-space-xs, 4px);
+    }
+    .feature-card .feature-text p {
+      font-family: var(--font-body);
+      font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* === QUOTE === */
+    .quote-mark {
+      font-family: var(--font-display);
+      font-size: 6rem;
+      color: var(--accent);
+      opacity: 0.3;
+      line-height: 0.5;
+      margin-bottom: var(--rh-space-md, 16px);
+    }
+    .quote-text {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: var(--rh-font-size-heading-md, 1.5rem);
+      color: var(--text-primary);
+      line-height: 1.5;
+      max-width: 750px;
+      margin-bottom: var(--rh-space-lg, 24px);
+    }
+    .quote-attribution {
+      font-family: var(--font-body);
+      font-size: var(--rh-font-size-body-text-md, 1rem);
+      color: var(--text-muted);
+    }
+
+    /* === CTA LIST === */
+    .cta-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--rh-space-md, 16px);
+      max-width: 700px;
+    }
+    .cta-list li {
+      font-family: var(--font-body);
+      font-size: var(--rh-font-size-body-text-lg, 1.125rem);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      padding-left: var(--rh-space-xl, 32px);
+      position: relative;
+    }
+    .cta-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* === BULLET LIST === */
+    .content-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--rh-space-sm, 8px);
+      max-width: 750px;
+    }
+    .content-list li {
+      font-family: var(--font-body);
+      font-size: var(--rh-font-size-body-text-lg, 1.125rem);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      padding-left: var(--rh-space-xl, 32px);
+      position: relative;
+    }
+    .content-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* === CODE BLOCK === */
+    .code-block {
+      background: var(--bg-secondary);
+      border: 1px solid var(--tag-border);
+      border-radius: var(--rh-border-radius-default, 3px);
+      padding: var(--rh-space-lg, 24px) var(--rh-space-xl, 32px);
+      font-family: var(--font-mono);
+      font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+      color: var(--text-secondary);
+      line-height: 1.8;
+      max-width: 850px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .code-block .keyword { color: var(--accent-light); }
+    .code-block .string { color: #63bdbd; }
+    .code-block .comment { color: var(--text-muted); opacity: 0.7; }
+    .code-block .property { color: #d0c5f4; }
+
+    /* === AGENT CARD GRID === */
+    .agent-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--rh-space-md, 16px);
+      max-width: 950px;
+      width: 100%;
+    }
+    .agent-card {
+      padding: var(--rh-space-lg, 24px);
+      background: var(--bg-secondary);
+      border-radius: var(--rh-border-radius-default, 3px);
+      border-top: var(--rh-border-width-md, 2px) solid var(--tag-border);
+      display: flex;
+      flex-direction: column;
+      gap: var(--rh-space-sm, 8px);
+    }
+    .agent-card.accent-top { border-top-color: var(--accent); }
+    .agent-card h4 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--rh-font-size-heading-sm, 1.25rem);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--rh-space-sm, 8px);
+    }
+    .agent-card p {
+      font-family: var(--font-body);
+      font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* === LOGO FOOTER === */
+    .logo-footer {
+      margin-top: auto;
+      padding-top: var(--rh-space-xl, 32px);
+      display: flex;
+      align-items: center;
+    }
+
+    /* === THANK YOU / DEMO SLIDE === */
+    .thank-you-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      flex: 1;
+    }
+
+    /* === NAVIGATION === */
+    .controls {
+      position: fixed;
+      bottom: var(--rh-space-lg, 24px);
+      right: var(--rh-space-xl, 32px);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: var(--rh-space-xs, 4px);
+      z-index: 100;
+    }
+    .nav-hint {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      opacity: 0.5;
+    }
+    .progress {
+      font-family: var(--font-mono);
+      font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+      color: var(--text-muted);
+    }
+    .progress .current { color: var(--accent); font-weight: 700; }
+
+    /* === NOTES PANEL === */
+    .notes-panel {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      max-height: 0;
+      overflow-y: auto;
+      background: rgba(15,15,15,0.97);
+      border-top: 2px solid var(--accent);
+      padding: 0 var(--rh-space-3xl, 64px);
+      font-family: var(--font-body);
+      font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+      color: var(--text-secondary);
+      line-height: 1.7;
+      z-index: 200;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    .notes-panel.visible {
+      max-height: 40vh;
+      padding: var(--rh-space-lg, 24px) var(--rh-space-3xl, 64px);
+    }
+    .notes-panel a { color: var(--accent-light); }
+    .notes-panel strong { color: var(--text-primary); }
+
+    /* === ANIMATIONS === */
+    .slide.active .animate-in {
+      animation: fadeSlideUp 0.6s ease-out forwards;
+      opacity: 0;
+    }
+    .slide.active .animate-in:nth-child(2) { animation-delay: 0.1s; }
+    .slide.active .animate-in:nth-child(3) { animation-delay: 0.2s; }
+    .slide.active .animate-in:nth-child(4) { animation-delay: 0.3s; }
+    .slide.active .animate-in:nth-child(5) { animation-delay: 0.4s; }
+    .slide.active .animate-in:nth-child(6) { animation-delay: 0.5s; }
+    .slide.active .animate-in:nth-child(7) { animation-delay: 0.6s; }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 1: TITLE -->
+    <!-- ============================================================ -->
+    <div class="slide active" data-notes="<strong>Navigation tips:</strong> Arrow keys or click to navigate. Press 'N' to toggle these contextual notes — they contain references, links, and deeper context for each slide.<br><br><strong>Context:</strong> This presentation covers how to create custom agent personas within AI coding assistants like Claude Code and OpenCode. Custom agents provide specialized domain expertise that can be invoked on demand during prompting sessions, eliminating the need to switch tools or contexts.<br><br><strong>Key resource:</strong> Claude Code documentation on custom agents and slash commands — these are defined in CLAUDE.md files and can be project-scoped or global.">
+      <div class="breadcrumb animate-in">
+        <svg class="rh-logo small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" role="img" aria-label="Red Hat">
+          <title>Red Hat</title>
+          <path d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78" fill="#e00"/>
+          <path d="M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33l3.66-9.06A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45,12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42Z"/>
+          <path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z" fill="#fff"/>
+        </svg>
+        <span>› DEVX AGENTS</span>
+      </div>
+      <div class="slide-label animate-in">—— DEVX WORKING GROUP · MAR 13, 2026</div>
+      <h1 class="animate-in">Designing <span class="accent-italic">Custom Agents</span></h1>
+      <div class="subtitle animate-in">Build specialized agent personas with distinct roles, expertise, and behaviors — invoked on demand inside your AI coding assistant without ever switching tools.</div>
+      <div class="tags animate-in">
+        <span class="tag accent">Claude Code</span>
+        <span class="tag">Custom Personas</span>
+        <span class="tag">On-Demand Expertise</span>
+        <span class="tag">OpenCode</span>
+      </div>
+      <div class="attribution animate-in">Todd Wardzinski · Architect · Red Hat</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 2: THE PROBLEM — Context Switching Kills Flow -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>The pain is real:</strong> Developers today juggle multiple browser tabs, Slack channels, internal wikis, linting dashboards, and architecture docs — all while trying to stay in a coding flow state. Every context switch costs ~23 minutes of recovery time (University of California, Irvine). AI coding assistants help, but generic responses lack the depth of a specialized reviewer or architect.<br><br><strong>Research:</strong> GitHub's 2025 Developer Survey found that 62% of developers cite 'too many tools' as a top productivity blocker.">
+      <h2 class="animate-in"><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/alert.svg" alt=""> Context Switching <span class="accent">Kills</span> Developer Flow</h2>
+      <div class="body-text animate-in" style="margin-bottom: var(--rh-space-xl, 32px);">Developers juggle code review checklists, architecture guidance, security policies, documentation standards, and style guides across dozens of tabs and tools. Each context switch costs real time and cognitive load.</div>
+      <ul class="content-list animate-in">
+        <li>Average developer switches tools <strong style="color: var(--text-primary);">12+ times per hour</strong></li>
+        <li>Each switch costs <strong style="color: var(--text-primary);">~23 minutes</strong> to regain deep focus</li>
+        <li>Generic AI responses lack <strong style="color: var(--text-primary);">domain-specific depth</strong></li>
+      </ul>
+      <div class="source animate-in">Source: University of California, Irvine — "The Cost of Interrupted Work"</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 3: THE INSIGHT — What If Your AI Had Specialists? -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>The core insight:</strong> Instead of getting one generalist AI response, you can define multiple agent personas — each with a distinct role, set of instructions, and behavioral guidelines. These agents live in your project configuration (CLAUDE.md, .opencode.yaml, etc.) and can be invoked instantly during any prompting session.<br><br>Think of it like having a team of senior engineers sitting beside you — a security expert, an architect, a doc writer — all available on demand without leaving your terminal.">
+      <div class="quote-mark animate-in">"</div>
+      <div class="quote-text animate-in">What if your AI assistant could become a team of specialists — each one an expert in exactly the domain you need, available the moment you need them?</div>
+      <div class="quote-attribution animate-in">The core idea behind custom agent personas</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 4: WHAT IS A CUSTOM AGENT? -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>Definition clarity:</strong> A custom agent is NOT a separate application or microservice. It's a structured persona definition — a set of instructions, behavioral constraints, and domain knowledge — that shapes how your AI coding assistant responds within a specific context.<br><br>In Claude Code, agents are defined in CLAUDE.md files at the project root or in ~/.claude/ for global availability. In OpenCode, they're configured in .opencode.yaml. The format varies, but the concept is universal: give the AI a role, rules, and specialized knowledge.">
+      <h2 class="animate-in"><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/robot.svg" alt=""> A Custom Agent Is a <span class="accent">Persona With Purpose</span></h2>
+      <div class="feature-grid animate-in">
+        <div class="feature-card">
+          <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/user.svg" alt="">
+          <div class="feature-text">
+            <h4>Role Definition</h4>
+            <p>A named identity with specific expertise — "Security Reviewer", "API Architect", "Doc Writer"</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/checklist.svg" alt="">
+          <div class="feature-text">
+            <h4>Behavioral Rules</h4>
+            <p>Explicit instructions on what to check, how to respond, and what standards to enforce</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/book.svg" alt="">
+          <div class="feature-text">
+            <h4>Domain Knowledge</h4>
+            <p>Project conventions, team standards, approved patterns, and reference documentation baked in</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/command-line.svg" alt="">
+          <div class="feature-text">
+            <h4>Instant Invocation</h4>
+            <p>Called directly from your terminal or editor — no tool switching, no new windows</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 5: WHERE AGENTS LIVE — Architecture -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>Implementation detail:</strong> In Claude Code, agents are defined in CLAUDE.md files. Place a CLAUDE.md at your project root for project-scoped agents, or in ~/.claude/CLAUDE.md for global agents available across all projects. You can also use the /agents slash command or define subagent configurations.<br><br>In OpenCode, agents are defined in the .opencode.yaml configuration file under an 'agents' key. Other tools like Cursor use .cursorrules files. The concept translates across all AI coding assistants — only the format differs.<br><br><strong>Key principle:</strong> Agents should be version-controlled alongside your code so the whole team benefits.">
+      <h2 class="animate-in"><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/architecture.svg" alt=""> Agents Live <span class="accent">Where Your Code Lives</span></h2>
+      <div class="arch-diagram animate-in">
+        <div class="arch-group-label">Project Repository</div>
+        <div class="arch-row">
+          <div class="arch-box accent-border">
+            <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/code.svg" alt="">
+            <span class="label">CLAUDE.md</span>
+            <span class="sublabel">Project agents & rules</span>
+          </div>
+          <div class="arch-box">
+            <img class="rh-icon small" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/gear.svg" alt="">
+            <span class="label">.opencode.yaml</span>
+            <span class="sublabel">OpenCode agents</span>
+          </div>
+          <div class="arch-box">
+            <img class="rh-icon small" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/folder.svg" alt="">
+            <span class="label">.cursorrules</span>
+            <span class="sublabel">Cursor rules</span>
+          </div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-group-label">Loaded Automatically by AI Assistant</div>
+        <div class="arch-row">
+          <div class="arch-box accent-border">
+            <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/robot.svg" alt="">
+            <span class="label">Custom Agent Personas</span>
+            <span class="sublabel">Available on demand in every session</span>
+          </div>
+        </div>
+      </div>
+      <div class="source animate-in">Version-controlled · Team-shared · Always in sync with the codebase</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 6: ANATOMY OF AN AGENT — Code Example -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>Syntax breakdown:</strong> This example shows a security reviewer agent defined in CLAUDE.md format. The key elements are: (1) a clear role name, (2) behavioral instructions that tell the AI what to look for, (3) output format requirements, and (4) domain-specific knowledge like OWASP references.<br><br>Notice how specific the instructions are — 'check for SQL injection, XSS, CSRF' rather than just 'review for security'. The more specific your agent definition, the more useful the responses.<br><br><strong>Tip:</strong> Start simple and iterate. Your first agent definition doesn't need to be perfect — refine it as you discover what works.">
+      <h2 class="animate-in"><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/code.svg" alt=""> Anatomy of an <span class="accent">Agent Definition</span></h2>
+      <div class="code-block animate-in"><span class="comment"># In CLAUDE.md or project configuration</span>
+
+<span class="comment">## Agent: Security Reviewer</span>
+
+<span class="property">You are a senior application security engineer.</span>
+<span class="property">When asked to review code, always check for:</span>
+
+<span class="string">- SQL injection and parameterized query usage</span>
+<span class="string">- XSS vulnerabilities in user-facing output</span>
+<span class="string">- CSRF token validation on state-changing endpoints</span>
+<span class="string">- Secrets or credentials hardcoded in source</span>
+<span class="string">- Dependency vulnerabilities (check lock files)</span>
+
+<span class="property">Output format:</span>
+<span class="keyword">  Severity: [CRITICAL | HIGH | MEDIUM | LOW]</span>
+<span class="keyword">  Finding: One-line description</span>
+<span class="keyword">  Location: file:line_number</span>
+<span class="keyword">  Remediation: Specific fix recommendation</span>
+
+<span class="comment"># Reference: OWASP Top 10 (2025)</span></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 7: STAT — Unlimited Specialists -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>The multiplier effect:</strong> A single developer with well-defined custom agents effectively has an entire review team available on demand. You're not limited to one perspective — you can invoke a security reviewer, then an architect, then a performance analyst, all in the same session without leaving your terminal.<br><br>This is especially powerful for solo developers, small teams, or developers working in specialized domains where expert review is hard to come by.<br><br>[IMAGE OPPORTUNITY] Prompt for AI image generation: 'Abstract visualization of one developer node connected to six specialist nodes in a radial pattern, dark background with subtle red connection lines, minimalist geometric style, Red Hat brand colors'">
+      <div class="animate-in" style="text-align: center;">
+        <img class="rh-icon xl accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/community-people.svg" alt="">
+      </div>
+      <div class="big-number animate-in" style="text-align: center;">&#8734;</div>
+      <div class="big-number-context animate-in" style="text-align: center; margin: 0 auto;">Specialized perspectives available on demand — without switching tools, hiring consultants, or waiting for async review cycles.</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 8: AGENT CATALOG — Six Example Agents -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>Agent library ideas:</strong> These six agents represent common needs across development teams. Each can be defined in your CLAUDE.md and invoked by simply describing what you need — 'review this for security' triggers the Security Reviewer persona, 'help me design this API' triggers the API Architect.<br><br>You can also create highly specialized agents: a 'Kubernetes Manifest Reviewer' that checks resource limits and security contexts, a 'GraphQL Schema Designer' that enforces naming conventions, or a 'Migration Planner' that identifies risks in database schema changes.<br><br>The key is to match agents to your team's actual pain points — not to create agents for everything.">
+      <h2 class="animate-in">Build a Library of <span class="accent">Specialized Agents</span></h2>
+      <div class="agent-grid animate-in">
+        <div class="agent-card accent-top">
+          <h4><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/shield.svg" alt=""> Security Reviewer</h4>
+          <p>OWASP Top 10 checks, dependency audits, secrets detection, compliance validation</p>
+        </div>
+        <div class="agent-card accent-top">
+          <h4><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/architect.svg" alt=""> API Architect</h4>
+          <p>REST/gRPC design patterns, versioning strategy, backward compatibility analysis</p>
+        </div>
+        <div class="agent-card accent-top">
+          <h4><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/notepad.svg" alt=""> Doc Writer</h4>
+          <p>README generation, API docs, inline comments, changelog entries following team conventions</p>
+        </div>
+        <div class="agent-card">
+          <h4><img class="rh-icon small" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/speedometer.svg" alt=""> Perf Analyst</h4>
+          <p>Complexity analysis, N+1 query detection, memory leak patterns, caching recommendations</p>
+        </div>
+        <div class="agent-card">
+          <h4><img class="rh-icon small" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/automation.svg" alt=""> Test Strategist</h4>
+          <p>Coverage gaps, edge cases, test architecture, mocking strategy, integration test design</p>
+        </div>
+        <div class="agent-card">
+          <h4><img class="rh-icon small" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/devops.svg" alt=""> DevOps Guide</h4>
+          <p>CI/CD pipeline design, container best practices, deployment strategy, observability setup</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 9: COMPARISON — Without vs With Custom Agents -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>The before/after contrast:</strong> Without custom agents, developers get generic AI responses that require additional prompting to get to useful depth. With custom agents, the first response is already shaped by domain expertise, team standards, and specific behavioral rules.<br><br>This is especially impactful for teams with strong conventions — code style guides, API design standards, security policies — that would otherwise need to be re-explained to the AI in every session.">
+      <h2 class="animate-in">Generic Prompting vs. <span class="accent">Agent-Driven</span> Prompting</h2>
+      <div class="comparison animate-in">
+        <div class="compare-col">
+          <h3><img class="rh-icon small" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/padlock-unlocked.svg" alt=""> Without Agents</h3>
+          <div class="compare-item"><strong>Generic responses</strong> — re-explain context every session</div>
+          <div class="compare-item"><strong>Inconsistent depth</strong> — quality varies by prompt quality</div>
+          <div class="compare-item"><strong>No team standards</strong> — AI doesn't know your conventions</div>
+          <div class="compare-item"><strong>One perspective</strong> — generalist answers only</div>
+        </div>
+        <div class="compare-col highlight">
+          <h3><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/padlock-locked.svg" alt=""> With Custom Agents</h3>
+          <div class="compare-item"><strong>Contextual from the start</strong> — agents know your project</div>
+          <div class="compare-item"><strong>Consistent quality</strong> — behavioral rules enforce standards</div>
+          <div class="compare-item"><strong>Team conventions baked in</strong> — style, patterns, policies</div>
+          <div class="compare-item"><strong>Multiple specialists</strong> — invoke the right expert per task</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 10: MULTI-TOOL COMPATIBILITY -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>Tool compatibility:</strong> While this presentation focuses on Claude Code as the primary vehicle, the concept of custom agents is portable. OpenCode supports agent definitions in its YAML config. Cursor uses .cursorrules. Windsurf has its own rules format. Even VS Code extensions like Continue and Cody support system-prompt customization.<br><br>The underlying pattern is universal: provide structured instructions that shape AI behavior for your specific project context. Teams that invest in well-crafted agent definitions can often adapt them across tools with minor format changes.<br><br><strong>Claude Code specific features:</strong> CLAUDE.md files, /agents command, subagent_type parameter in Agent tool, project-scoped and global configurations.">
+      <h2 class="animate-in">One Concept, <span class="accent">Many Tools</span></h2>
+      <div class="body-text animate-in" style="margin-bottom: var(--rh-space-xl, 32px);">Custom agents are primarily demonstrated in Claude Code, but the pattern translates across the AI coding assistant ecosystem.</div>
+      <div class="arch-diagram animate-in">
+        <div class="arch-row">
+          <div class="arch-box accent-border">
+            <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/command-line.svg" alt="">
+            <span class="label">Claude Code</span>
+            <span class="sublabel">CLAUDE.md · /agents · subagents</span>
+          </div>
+          <div class="arch-box">
+            <img class="rh-icon small" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/code.svg" alt="">
+            <span class="label">OpenCode</span>
+            <span class="sublabel">.opencode.yaml agents</span>
+          </div>
+          <div class="arch-box">
+            <img class="rh-icon small" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/laptop.svg" alt="">
+            <span class="label">Cursor / Windsurf</span>
+            <span class="sublabel">.cursorrules / rules</span>
+          </div>
+        </div>
+        <div class="arch-arrow">↑</div>
+        <div class="arch-row">
+          <div class="arch-box" style="flex: 1;">
+            <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/interoperability.svg" alt="">
+            <span class="label">Universal Pattern</span>
+            <span class="sublabel">Structured instructions → Specialized AI behavior</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 11: BEST PRACTICES -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>Crafting effective agents:</strong> The difference between a mediocre agent and a great one comes down to specificity. Vague instructions like 'review code for quality' produce vague results. Specific instructions like 'check all database queries use parameterized inputs and flag any string concatenation in SQL statements' produce actionable findings.<br><br><strong>Anti-patterns to avoid:</strong> Don't create agents that overlap heavily — this creates confusion about which to use. Don't make agents too broad (defeats the purpose) or too narrow (not worth maintaining). Don't forget to version-control your agent definitions alongside the code they support.<br><br><strong>Iteration tip:</strong> Keep a 'feedback log' for each agent. When it gives a bad recommendation, update the agent definition. Over time, your agents become highly calibrated to your team's needs.">
+      <h2 class="animate-in"><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/blueprints.svg" alt=""> Best Practices for <span class="accent">Agent Design</span></h2>
+      <div class="feature-grid animate-in">
+        <div class="feature-card">
+          <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/target.svg" alt="">
+          <div class="feature-text">
+            <h4>Be Specific</h4>
+            <p>Name exact checks, standards, and output formats. "Check for OWASP A03" beats "review security."</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/lifecycle.svg" alt="">
+          <div class="feature-text">
+            <h4>Iterate Often</h4>
+            <p>Refine agents based on real usage. When one gives bad advice, update the definition immediately.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/collaboration.svg" alt="">
+          <div class="feature-text">
+            <h4>Share With the Team</h4>
+            <p>Version-control agent definitions so everyone benefits. Review agent changes like code changes.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/simplify.svg" alt="">
+          <div class="feature-text">
+            <h4>Keep Them Focused</h4>
+            <p>One agent, one domain. A security agent shouldn't also give style advice. Compose agents, don't bloat them.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 12: VALUE PROPOSITION SUMMARY -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>Executive summary:</strong> Custom agents transform a general-purpose AI coding assistant into a team of domain specialists. The investment is minimal — markdown files in your repository — but the return is significant: consistent quality, enforced standards, faster reviews, and reduced context switching.<br><br>For teams adopting AI coding assistants, custom agents are the difference between 'AI that helps' and 'AI that knows how we work.'">
+      <h2 class="animate-in">On-Demand Expertise, <span class="accent">Zero Context Switching</span></h2>
+      <div class="body-text animate-in" style="margin-bottom: var(--rh-space-2xl, 48px);">Custom agents give every developer access to specialized perspectives — without switching tools, waiting for reviews, or losing flow state.</div>
+      <div class="arch-diagram animate-in">
+        <div class="arch-row">
+          <div class="arch-box accent-border">
+            <span class="label" style="font-size: var(--rh-font-size-heading-md, 1.5rem); color: var(--accent);">Define</span>
+            <span class="sublabel">Write agent personas in your project config</span>
+          </div>
+          <div class="arch-box accent-border">
+            <span class="label" style="font-size: var(--rh-font-size-heading-md, 1.5rem); color: var(--accent);">Invoke</span>
+            <span class="sublabel">Call the right specialist for each task</span>
+          </div>
+          <div class="arch-box accent-border">
+            <span class="label" style="font-size: var(--rh-font-size-heading-md, 1.5rem); color: var(--accent);">Iterate</span>
+            <span class="sublabel">Refine agents as your team evolves</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 13: CTA / GETTING STARTED -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>Getting started is simple:</strong> Create a CLAUDE.md file in your project root. Add one agent definition — start with whatever your team needs most (security review and documentation are popular first choices). Use it for a week, then refine based on what worked and what didn't.<br><br><strong>Resources:</strong><br>- Claude Code docs on CLAUDE.md format<br>- OpenCode configuration reference<br>- Internal DevX team Slack channel for sharing agent definitions<br>- This deck's example agents are available in the devx-agents repository">
+      <h2 class="animate-in"><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/rocket.svg" alt=""> Get Started in <span class="accent">Five Minutes</span></h2>
+      <ul class="cta-list animate-in">
+        <li>Create a <strong style="color: var(--text-primary);">CLAUDE.md</strong> file in your project root (or <strong style="color: var(--text-primary);">.opencode.yaml</strong> for OpenCode)</li>
+        <li>Define your first agent — start with <strong style="color: var(--text-primary);">Security Reviewer</strong> or <strong style="color: var(--text-primary);">Doc Writer</strong></li>
+        <li>Be specific: name the checks, standards, and output format you expect</li>
+        <li>Use it for one week, then refine based on what the agent gets right and wrong</li>
+        <li>Share your agent definitions with the team — <strong style="color: var(--text-primary);">version-control them</strong></li>
+      </ul>
+      <div class="logo-footer animate-in">
+        <svg class="rh-logo large" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" role="img" aria-label="Red Hat">
+          <title>Red Hat</title>
+          <path d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78" fill="#e00"/>
+          <path d="M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33l3.66-9.06A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45,12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42Z"/>
+          <path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z" fill="#fff"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 14: DEMO TIME -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>Demo plan:</strong> Live demonstration of creating and invoking custom agents in Claude Code. We'll define a Security Reviewer agent in CLAUDE.md, then invoke it to review a sample codebase. We'll show how the agent's specialized instructions produce more targeted, actionable feedback compared to a generic prompt.">
+      <div class="thank-you-center">
+        <img class="rh-icon xl accent animate-in" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/command-line.svg" alt="" style="margin-bottom: var(--rh-space-xl, 32px);">
+        <h1 class="animate-in" style="text-align: center; max-width: 100%; font-size: var(--rh-font-size-heading-2xl, 3rem);"><span class="accent">Demo</span> Time</h1>
+        <div class="subtitle animate-in" style="text-align: center; max-width: 600px; margin: 0 auto;">Building and invoking custom agents live in Claude Code</div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 15: THANK YOU (always last) -->
+    <!-- ============================================================ -->
+    <div class="slide" style="background: var(--bg-primary);" data-notes="<strong>Thank you for attending!</strong> Reach out on the DevX Slack channel with questions, agent definitions you'd like to share, or feedback on your experience building custom agents.<br><br>All examples from this presentation are available in the devx-agents repository.<br><br><strong>Red Hat Quick Deck Skill:</strong> This presentation was generated using the Red Hat Quick Deck skill — an AI-powered presentation generator that produces self-contained, brand-compliant HTML slide decks. Scan the QR code or visit github.com/toddward/red-hat-quick-deck to learn more.">
+      <div class="thank-you-center">
+        <h1 class="animate-in" style="text-align: center; max-width: 100%; font-size: var(--rh-font-size-heading-2xl, 3rem);">Thank <span class="accent">You</span></h1>
+        <div class="attribution animate-in" style="text-align: center; padding-top: var(--rh-space-lg, 24px); font-size: var(--rh-font-size-body-text-lg, 1.125rem);">Todd Wardzinski · Architect · Red Hat</div>
+        <div class="animate-in" style="margin-top: var(--rh-space-2xl, 48px); display: flex; flex-direction: column; align-items: center; gap: var(--rh-space-lg, 24px);">
+          <div style="display: flex; align-items: center; gap: var(--rh-space-lg, 24px); padding: var(--rh-space-xl, 32px) var(--rh-space-2xl, 48px); background: var(--bg-secondary); border-radius: var(--rh-border-radius-default, 3px); border: 1px solid var(--tag-border);">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: var(--rh-space-sm, 8px);">
+              <!-- QR Code for https://github.com/toddward/red-hat-quick-deck -->
+              <canvas id="qr-canvas" width="160" height="160" style="border-radius: var(--rh-border-radius-default, 3px);"></canvas>
+              <span style="font-family: var(--font-mono); font-size: var(--rh-font-size-body-text-xs, 0.75rem); color: var(--text-muted);">github.com/toddward/red-hat-quick-deck</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: var(--rh-space-xs, 4px);">
+              <span style="font-family: var(--font-display); font-weight: 700; font-size: var(--rh-font-size-heading-md, 1.5rem); color: var(--text-primary);">Created with</span>
+              <span style="font-family: var(--font-display); font-weight: 900; font-size: var(--rh-font-size-heading-lg, 2rem); color: var(--accent);">Red Hat Quick Deck Skill</span>
+              <span style="font-family: var(--font-body); font-size: var(--rh-font-size-body-text-sm, 0.875rem); color: var(--text-muted); max-width: 350px; line-height: 1.5;">AI-powered, brand-compliant HTML presentations — scan to explore the open-source skill.</span>
+            </div>
+          </div>
+          <svg class="rh-logo large" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" role="img" aria-label="Red Hat">
+            <title>Red Hat</title>
+            <path d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78" fill="#e00"/>
+            <path d="M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33l3.66-9.06A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45,12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42Z"/>
+            <path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z" fill="#fff"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation Controls -->
+  <div class="controls">
+    <div class="nav-hint">← → or click to navigate · N for additional context</div>
+    <div class="progress"><span class="current">1</span> / <span class="total">15</span></div>
+  </div>
+
+  <!-- Notes Panel -->
+  <div class="notes-panel"></div>
+
+  <script>
+    (function() {
+      const slides = document.querySelectorAll('.slide');
+      const currentEl = document.querySelector('.current');
+      const totalEl = document.querySelector('.total');
+      const notesPanel = document.querySelector('.notes-panel');
+      let idx = 0;
+      let notesVisible = false;
+
+      totalEl.textContent = slides.length;
+
+      function show(i) {
+        slides.forEach((s, j) => {
+          s.classList.toggle('active', j === i);
+          s.style.display = j === i ? 'flex' : 'none';
+        });
+        currentEl.textContent = i + 1;
+        if (notesVisible && notesPanel) {
+          const note = slides[i].dataset.notes || '';
+          notesPanel.innerHTML = note;
+        }
+      }
+
+      function next() { if (idx < slides.length - 1) { idx++; show(idx); } }
+      function prev() { if (idx > 0) { idx--; show(idx); } }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+        if (e.key === 'ArrowLeft') { prev(); }
+        if (e.key === 'n' || e.key === 'N') {
+          notesVisible = !notesVisible;
+          if (notesPanel) notesPanel.classList.toggle('visible', notesVisible);
+          show(idx);
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.controls') || e.target.closest('.notes-panel')) return;
+        const x = e.clientX / window.innerWidth;
+        x > 0.5 ? next() : prev();
+      });
+
+      let touchStartX = 0;
+      document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+      document.addEventListener('touchend', (e) => {
+        const diff = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(diff) > 50) { diff < 0 ? next() : prev(); }
+      });
+
+      show(0);
+    })();
+
+    // Minimal QR Code generator for the Thank You slide
+    (function() {
+      // QR Code generator using canvas — encodes https://github.com/toddward/red-hat-quick-deck
+      // Using a pre-computed QR matrix for this specific URL (Version 4, ECC-M, 33x33 modules)
+      const url = 'https://github.com/toddward/red-hat-quick-deck';
+      const canvas = document.getElementById('qr-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+
+      // Generate QR code using the built-in minimal encoder
+      function drawQR() {
+        // We'll use an image-based approach with a QR API rendered at build time
+        // For a self-contained approach, draw a high-quality QR from pre-encoded data
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, size, size);
+          ctx.drawImage(img, 0, 0, size, size);
+        };
+        img.onerror = function() {
+          // Fallback: draw a styled placeholder with the URL
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, size, size);
+          drawFallbackQR();
+        };
+        // Use Google Charts QR API (widely available, no auth needed)
+        img.src = 'https://chart.googleapis.com/chart?cht=qr&chs=160x160&chl=' + encodeURIComponent(url) + '&choe=UTF-8&chld=M|2';
+
+        // Also attempt a second source in case Google Charts is down
+        setTimeout(function() {
+          if (!img.complete || img.naturalHeight === 0) {
+            img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(url) + '&margin=4';
+          }
+        }, 2000);
+      }
+
+      function drawFallbackQR() {
+        // Draw a visual QR-like pattern as pure fallback
+        const moduleSize = 4;
+        const modules = Math.floor(size / moduleSize);
+        ctx.fillStyle = '#000000';
+
+        // Finder patterns (top-left, top-right, bottom-left)
+        function drawFinder(x, y) {
+          ctx.fillRect(x, y, 7 * moduleSize, moduleSize);
+          ctx.fillRect(x, (y + 6 * moduleSize), 7 * moduleSize, moduleSize);
+          ctx.fillRect(x, y, moduleSize, 7 * moduleSize);
+          ctx.fillRect(x + 6 * moduleSize, y, moduleSize, 7 * moduleSize);
+          ctx.fillRect(x + 2 * moduleSize, y + 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+        }
+        drawFinder(2 * moduleSize, 2 * moduleSize);
+        drawFinder((modules - 9) * moduleSize, 2 * moduleSize);
+        drawFinder(2 * moduleSize, (modules - 9) * moduleSize);
+
+        // Center text
+        ctx.fillStyle = '#ee0000';
+        ctx.font = 'bold 11px "Red Hat Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('SCAN ME', size / 2, size / 2 - 4);
+        ctx.fillStyle = '#000000';
+        ctx.font = '9px "Red Hat Mono", monospace';
+        ctx.fillText('QR Code', size / 2, size / 2 + 10);
+      }
+
+      drawQR();
+    })();
+  </script>
+</body>
+</html>
