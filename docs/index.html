@@ -671,11 +671,11 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 6: ANATOMY OF AN AGENT — Code Example -->
+    <!-- SLIDE 6: ANATOMY OF A SUBAGENT — Inline in CLAUDE.md -->
     <!-- ============================================================ -->
-    <div class="slide" data-notes="<strong>Syntax breakdown:</strong> This example shows a security reviewer agent defined in CLAUDE.md format. The key elements are: (1) a clear role name, (2) behavioral instructions that tell the AI what to look for, (3) output format requirements, and (4) domain-specific knowledge like OWASP references.<br><br>Notice how specific the instructions are — 'check for SQL injection, XSS, CSRF' rather than just 'review for security'. The more specific your agent definition, the more useful the responses.<br><br><strong>Tip:</strong> Start simple and iterate. Your first agent definition doesn't need to be perfect — refine it as you discover what works.">
-      <h2 class="animate-in"><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/code.svg" alt=""> Anatomy of an <span class="accent">Agent Definition</span></h2>
-      <div class="code-block animate-in"><span class="comment"># In CLAUDE.md or project configuration</span>
+    <div class="slide" data-notes="<strong>Inline approach:</strong> This example shows a security reviewer subagent defined directly in CLAUDE.md. This is the simplest approach — Claude reads the persona instructions and adopts them when asked to review code for security.<br><br>Notice how specific the instructions are — 'check for SQL injection, XSS, CSRF' rather than just 'review for security'. The more specific your subagent definition, the more useful the responses.<br><br><strong>Tip:</strong> Start simple and iterate. Your first subagent definition doesn't need to be perfect — refine it as you discover what works. For more control (tool restrictions, model selection, hooks), use standalone subagent files in <code>.claude/agents/</code>.">
+      <h2 class="animate-in"><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/code.svg" alt=""> Inline <span class="accent">Subagent</span> in CLAUDE.md</h2>
+      <div class="code-block animate-in"><span class="comment"># In CLAUDE.md — simple persona-based approach</span>
 
 <span class="comment">## Agent: Security Reviewer</span>
 
@@ -698,6 +698,33 @@
     </div>
 
     <!-- ============================================================ -->
+    <!-- SLIDE 6b: STANDALONE SUBAGENT FILE -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>Standalone subagent files:</strong> For full control, define subagents as standalone Markdown files in <code>.claude/agents/</code> (project-level) or <code>~/.claude/agents/</code> (user-level). Each file uses YAML frontmatter for configuration — <code>name</code> and <code>description</code> are required, plus optional fields like <code>tools</code>, <code>model</code>, <code>permissionMode</code>, <code>hooks</code>, and <code>memory</code>.<br><br>The body below the frontmatter becomes the subagent's system prompt. Subagents run in their own context window with independent permissions, preserving your main conversation context.<br><br>Key advantages over inline CLAUDE.md definitions: tool restrictions, model selection (route to Haiku for speed), lifecycle hooks, persistent memory across sessions, and permission modes. Manage subagents interactively with the <code>/agents</code> command.">
+      <h2 class="animate-in"><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/folder.svg" alt=""> Standalone <span class="accent">Subagent Files</span></h2>
+      <div class="code-block animate-in"><span class="comment"># .claude/agents/doc-writer.md</span>
+<span class="keyword">---</span>
+<span class="keyword">name: doc-writer</span>
+<span class="keyword">description: Technical documentation specialist.</span>
+<span class="keyword">  Use for README, API docs, and changelog writing.</span>
+<span class="keyword">tools: Read, Grep, Glob, Write, Edit</span>
+<span class="keyword">model: sonnet</span>
+<span class="keyword">---</span>
+
+<span class="property">You are a senior technical writer who creates</span>
+<span class="property">clear, developer-friendly documentation</span>
+<span class="property">following the Diataxis framework.</span>
+
+<span class="property">When asked to write or review documentation:</span>
+
+<span class="string">- README.md: purpose, prerequisites, quick start</span>
+<span class="string">- API reference: method, path, schemas, curl examples</span>
+<span class="string">- Inline comments: only where logic is non-obvious</span>
+<span class="string">- Code examples: runnable and copy-pasteable</span></div>
+      <div class="subtitle animate-in" style="margin-top: var(--rh-space-lg, 24px); text-align: center;"><code style="font-family: var(--font-mono); color: var(--accent-light); background: var(--bg-surface); padding: 2px 8px; border-radius: 3px;">name</code> + <code style="font-family: var(--font-mono); color: var(--accent-light); background: var(--bg-surface); padding: 2px 8px; border-radius: 3px;">description</code> required · <code style="font-family: var(--font-mono); color: var(--accent-light); background: var(--bg-surface); padding: 2px 8px; border-radius: 3px;">tools</code>, <code style="font-family: var(--font-mono); color: var(--accent-light); background: var(--bg-surface); padding: 2px 8px; border-radius: 3px;">model</code>, <code style="font-family: var(--font-mono); color: var(--accent-light); background: var(--bg-surface); padding: 2px 8px; border-radius: 3px;">hooks</code>, <code style="font-family: var(--font-mono); color: var(--accent-light); background: var(--bg-surface); padding: 2px 8px; border-radius: 3px;">memory</code> optional</div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- SLIDE 7: STAT — Unlimited Specialists -->
     <!-- ============================================================ -->
     <div class="slide" data-notes="<strong>The multiplier effect:</strong> A single developer with well-defined custom agents effectively has an entire review team available on demand. You're not limited to one perspective — you can invoke a security reviewer, then an architect, then a performance analyst, all in the same session without leaving your terminal.<br><br>This is especially powerful for solo developers, small teams, or developers working in specialized domains where expert review is hard to come by.<br><br>[IMAGE OPPORTUNITY] Prompt for AI image generation: 'Abstract visualization of one developer node connected to six specialist nodes in a radial pattern, dark background with subtle red connection lines, minimalist geometric style, Red Hat brand colors'">
@@ -705,7 +732,7 @@
         <img class="rh-icon xl accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/community-people.svg" alt="">
       </div>
       <div class="big-number animate-in" style="text-align: center;">&#8734;</div>
-      <div class="big-number-context animate-in" style="text-align: center; margin: 0 auto;">Specialized perspectives available on demand — without switching tools, hiring consultants, or waiting for async review cycles.</div>
+      <div class="big-number-context animate-in" style="text-align: center; margin: 0 auto;">Specialized perspectives available on demand — without switching tools or waiting for async review cycles.</div>
     </div>
 
     <!-- ============================================================ -->
