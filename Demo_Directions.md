@@ -24,7 +24,7 @@ ls -la
 cat CLAUDE.md
 ```
 
-**Talk track:** "This is our project. The `CLAUDE.md` file is the main instruction file that Claude Code reads automatically. Notice we have two agent personas defined inline here — the **Security Reviewer** and the **API Architect**. These are just markdown sections with detailed system prompts."
+**Notes:** "This is our project. The `CLAUDE.md` file is the main instruction file that Claude Code reads automatically. Notice we have two agent personas defined inline here — the **Security Reviewer** and the **API Architect**. These are just markdown sections with detailed system prompts."
 
 ### Step 2: Show the standalone agent files
 
@@ -34,7 +34,7 @@ cat .claude/agents/doc-writer.md
 cat .claude/agents/test-strategist.md
 ```
 
-**Talk track:** "We also have two more agents defined as standalone files in `.claude/agents/`. The **Doc Writer** and **Test Strategist** live here. This is a second approach — instead of putting everything in CLAUDE.md, you can break agents into their own files. Claude Code discovers them automatically."
+**Notes:** "We also have two more agents defined as standalone files in `.claude/agents/`. The **Doc Writer** and **Test Strategist** live here. This is a second approach — instead of putting everything in CLAUDE.md, you can break agents into their own files. Claude Code discovers them automatically."
 
 ### Step 3: Show the task list
 
@@ -42,7 +42,7 @@ cat .claude/agents/test-strategist.md
 cat TASKS.md
 ```
 
-**Talk track:** "We use a `TASKS.md` file for spec-driven development. This tells Claude what to build and in what order. It's a pattern that works really well — you define the spec upfront, and Claude follows it step by step."
+**Notes:** "We use a `TASKS.md` file for spec-driven development. This tells Claude what to build and in what order. It's a pattern that works really well — you define the spec upfront, and Claude follows it step by step."
 
 ---
 
@@ -58,21 +58,27 @@ claude
 
 Then prompt:
 
-> Complete Task 1 from TASKS.md — initialize the project and install dependencies.
+```bash
+Complete Task 1 from TASKS.md — initialize the project and install dependencies.
+```
 
-**Talk track:** "We start by asking Claude to follow our task list. It reads TASKS.md, sees what needs to be done, and executes the steps."
+**Notes:** "We start by asking Claude to follow our task list. It reads TASKS.md, sees what needs to be done, and executes the steps."
 
 ### Step 5: Build the API
 
-> Complete Task 2 from TASKS.md — build the Task Management API in server.js.
+```bash
+Complete Task 2 from TASKS.md — build the Task Management API in server.js.
+```
 
-**Talk track:** "Now Claude builds the actual API. It follows the spec in TASKS.md — the endpoints, the data model, the validation rules. This is spec-driven development in action."
+**Notes:** "Now Claude builds the actual API. It follows the spec in TASKS.md — the endpoints, the data model, the validation rules. This is spec-driven development in action."
 
 ### Step 6: Verify it works
 
-> Start the server and test it with a curl command.
+```bash
+Start the server and test it with a curl command.
+```
 
-**Talk track:** "Let's make sure it actually works before we bring in our agents."
+**Notes:** "Let's make sure it actually works before we bring in our agents."
 
 ---
 
@@ -82,27 +88,35 @@ Then prompt:
 
 ### Step 7: Security Review (inline agent)
 
-> Review server.js for security vulnerabilities.
+```bash
+Review server.js for security vulnerabilities.
+```
 
-**Talk track:** "Now watch what happens. Claude picks up the Security Reviewer persona from CLAUDE.md. Instead of a generic response, we get structured findings with severity levels, file locations, and specific remediation steps. This is the power of a well-designed agent prompt."
+**Notes:** "Now watch what happens. Claude picks up the Security Reviewer persona from CLAUDE.md. Instead of a generic response, we get structured findings with severity levels, file locations, and specific remediation steps. This is the power of a well-designed agent prompt."
 
 ### Step 8: API Design Review (inline agent)
 
-> Review the API design of server.js.
+```bash
+Review the API design of server.js.
+```
 
-**Talk track:** "Same idea, different agent. The API Architect evaluates our REST conventions, status codes, error handling, and gives us a design maturity rating. Notice the structured output format — that's defined in the agent prompt."
+**Notes:** "Same idea, different agent. The API Architect evaluates our REST conventions, status codes, error handling, and gives us a design maturity rating. Notice the structured output format — that's defined in the agent prompt."
 
 ### Step 9: Test Strategy (standalone agent)
 
-> @test-strategist Design a test strategy for server.js.
+```bash
+@test-strategist Design a test strategy for server.js.
+```
 
-**Talk track:** "Here we're invoking the Test Strategist using the `@agent` syntax. This agent lives in `.claude/agents/test-strategist.md`, not in CLAUDE.md. Claude Code discovers it automatically. It gives us prioritized test cases with the right mix of unit and integration tests."
+**Notes:** "Here we're invoking the Test Strategist using the `@agent` syntax. This agent lives in `.claude/agents/test-strategist.md`, not in CLAUDE.md. Claude Code discovers it automatically. It gives us prioritized test cases with the right mix of unit and integration tests."
 
 ### Step 10: Generate Documentation (standalone agent)
 
+```bash
 > @doc-writer Generate API documentation for this project.
+```
 
-**Talk track:** "Finally, the Doc Writer agent. Again using the `@agent` syntax for a standalone agent. It produces complete, ready-to-use markdown documentation — not an outline, but actual docs with curl examples."
+**Notes:** "Finally, the Doc Writer agent. Again using the `@agent` syntax for a standalone agent. It produces complete, ready-to-use markdown documentation — not an outline, but actual docs with curl examples."
 
 ---
 
