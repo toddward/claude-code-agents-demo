@@ -462,6 +462,55 @@
       line-height: 1.5;
     }
 
+    /* === AGENT GROUP COLUMNS === */
+    .agent-groups {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--rh-space-lg, 24px);
+      max-width: 950px;
+      width: 100%;
+    }
+    .agent-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--rh-space-md, 16px);
+    }
+    .agent-group-header {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--rh-font-size-heading-sm, 1.25rem);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--rh-space-sm, 8px);
+      padding-bottom: var(--rh-space-sm, 8px);
+      border-bottom: var(--rh-border-width-md, 2px) solid var(--accent);
+    }
+    .agent-group-member {
+      padding: var(--rh-space-sm, 8px) var(--rh-space-md, 16px);
+      background: var(--bg-secondary);
+      border-radius: var(--rh-border-radius-default, 3px);
+      border-left: var(--rh-border-width-md, 2px) solid var(--tag-border);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--rh-space-sm, 8px);
+    }
+    .agent-group-member.accent-left { border-left-color: var(--accent); }
+    .agent-group-member h4 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: var(--rh-font-size-body-text-md, 1rem);
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .agent-group-member p {
+      font-family: var(--font-body);
+      font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin: 2px 0 0 0;
+    }
+
     /* === LOGO FOOTER === */
     .logo-footer {
       margin-top: auto;
@@ -628,6 +677,88 @@
           <div class="feature-text">
             <h4>Instant Invocation</h4>
             <p>Called directly from your terminal or editor — no tool switching, no new windows</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 4b: AGENT GROUPS — Organizing Agents by Domain -->
+    <!-- ============================================================ -->
+    <div class="slide" data-notes="<strong>Organizing agents into groups:</strong> As your agent library grows, it helps to think in terms of <em>groups</em> — clusters of agents that share a domain or workflow focus. Developer groups handle code quality, testing, and architecture. Research groups handle investigation, documentation, and knowledge synthesis. Management groups assist with planning, reporting, and risk assessment. Marketing groups cover content creation, release communications, and community engagement.<br><br>Grouping agents helps teams decide which personas to define first and ensures coverage across the entire organization — not just engineering. Start with the group that addresses your biggest pain point.">
+      <h2 class="animate-in"><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/community-people.svg" alt=""> Agent <span class="accent">Groups</span> — Organizing by Domain</h2>
+      <div class="body-text animate-in" style="margin-bottom: var(--rh-space-lg, 24px);">Agents cluster naturally into domain groups. Each group covers a different phase of the development lifecycle.</div>
+      <div class="agent-groups animate-in">
+        <div class="agent-group">
+          <div class="agent-group-header">
+            <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/code.svg" alt="">
+            Developer Group
+          </div>
+          <div class="agent-group-member accent-left">
+            <div><h4>Security Reviewer</h4><p>OWASP checks, secrets detection, dependency audits</p></div>
+          </div>
+          <div class="agent-group-member accent-left">
+            <div><h4>API Architect</h4><p>REST design, versioning, status codes, consistency</p></div>
+          </div>
+          <div class="agent-group-member accent-left">
+            <div><h4>Test Strategist</h4><p>Coverage gaps, edge cases, mocking strategy</p></div>
+          </div>
+          <div class="agent-group-member accent-left">
+            <div><h4>Perf Analyst</h4><p>Complexity analysis, N+1 detection, caching</p></div>
+          </div>
+        </div>
+        <div class="agent-group">
+          <div class="agent-group-header">
+            <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/book.svg" alt="">
+            Research Group
+          </div>
+          <div class="agent-group-member">
+            <div><h4>Doc Writer</h4><p>READMEs, API docs, changelogs, inline comments</p></div>
+          </div>
+          <div class="agent-group-member">
+            <div><h4>Codebase Archaeologist</h4><p>Legacy code analysis, dependency mapping, tech debt</p></div>
+          </div>
+          <div class="agent-group-member">
+            <div><h4>Migration Planner</h4><p>Upgrade paths, risk assessment, breaking changes</p></div>
+          </div>
+          <div class="agent-group-member">
+            <div><h4>DevOps Guide</h4><p>CI/CD pipelines, containers, deployment strategy</p></div>
+          </div>
+        </div>
+        <div class="agent-group">
+          <div class="agent-group-header">
+            <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/collaboration.svg" alt="">
+            Management Group
+          </div>
+          <div class="agent-group-member">
+            <div><h4>Sprint Planner</h4><p>Story sizing, backlog grooming, velocity tracking</p></div>
+          </div>
+          <div class="agent-group-member">
+            <div><h4>Status Reporter</h4><p>Standup summaries, progress reports, blocker alerts</p></div>
+          </div>
+          <div class="agent-group-member">
+            <div><h4>Risk Assessor</h4><p>Timeline risks, resource gaps, dependency conflicts</p></div>
+          </div>
+          <div class="agent-group-member">
+            <div><h4>Retro Facilitator</h4><p>Action items, pattern analysis, team health metrics</p></div>
+          </div>
+        </div>
+        <div class="agent-group">
+          <div class="agent-group-header">
+            <img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/megaphone.svg" alt="">
+            Marketing Group
+          </div>
+          <div class="agent-group-member">
+            <div><h4>Content Strategist</h4><p>Blog posts, tutorials, feature announcements</p></div>
+          </div>
+          <div class="agent-group-member">
+            <div><h4>Release Comms</h4><p>Release notes, changelog narratives, customer emails</p></div>
+          </div>
+          <div class="agent-group-member">
+            <div><h4>Demo Builder</h4><p>Slide decks, talking points, live demo scripts</p></div>
+          </div>
+          <div class="agent-group-member">
+            <div><h4>Social Writer</h4><p>Twitter threads, LinkedIn posts, community updates</p></div>
           </div>
         </div>
       </div>
