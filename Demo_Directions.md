@@ -59,7 +59,7 @@ claude
 Then prompt:
 
 ```bash
-Complete Task 1 from TASKS.md — initialize the project and install dependencies.
+Complete Task 1 from TASKS.md — initialize the project and install dependencies. Tell me which agents you used for this task.
 ```
 
 **Notes:** "We start by asking Claude to follow our task list. It reads TASKS.md, sees what needs to be done, and executes the steps."
@@ -67,7 +67,7 @@ Complete Task 1 from TASKS.md — initialize the project and install dependencie
 ### Step 5: Build the API
 
 ```bash
-Complete Task 2 from TASKS.md — build the Task Management API in server.js.
+Complete Task 2 from TASKS.md — build the Task Management API in server.js. Tell me which agents you used for this task.
 ```
 
 **Notes:** "Now Claude builds the actual API. It follows the spec in TASKS.md — the endpoints, the data model, the validation rules. This is spec-driven development in action."
@@ -75,7 +75,7 @@ Complete Task 2 from TASKS.md — build the Task Management API in server.js.
 ### Step 6: Verify it works
 
 ```bash
-Start the server and test it with a curl command.
+Start the server and test it with a curl command. Tell me which agents you used for this task.
 ```
 
 **Notes:** "Let's make sure it actually works before we bring in our agents."
@@ -89,7 +89,7 @@ Start the server and test it with a curl command.
 ### Step 7: Security Review (inline agent)
 
 ```bash
-Review server.js for security vulnerabilities.
+Review server.js for security vulnerabilities. Tell me which agents you used for this task.
 ```
 
 **Notes:** "Now watch what happens. Claude picks up the Security Reviewer persona from CLAUDE.md. Instead of a generic response, we get structured findings with severity levels, file locations, and specific remediation steps. This is the power of a well-designed agent prompt."
@@ -97,7 +97,7 @@ Review server.js for security vulnerabilities.
 ### Step 8: API Design Review (inline agent)
 
 ```bash
-Review the API design of server.js.
+Review the API design of server.js. Tell me which agents you used for this task.
 ```
 
 **Notes:** "Same idea, different agent. The API Architect evaluates our REST conventions, status codes, error handling, and gives us a design maturity rating. Notice the structured output format — that's defined in the agent prompt."
@@ -105,7 +105,7 @@ Review the API design of server.js.
 ### Step 9: Test Strategy (standalone agent)
 
 ```bash
-@test-strategist Design a test strategy for server.js.
+@test-strategist Design a test strategy for server.js. Tell me which agents you used for this task.
 ```
 
 **Notes:** "Here we're invoking the Test Strategist using the `@agent` syntax. This agent lives in `.claude/agents/test-strategist.md`, not in CLAUDE.md. Claude Code discovers it automatically. It gives us prioritized test cases with the right mix of unit and integration tests."
@@ -113,7 +113,7 @@ Review the API design of server.js.
 ### Step 10: Generate Documentation (standalone agent)
 
 ```bash
-> @doc-writer Generate API documentation for this project.
+@doc-writer Generate API documentation for this project. Tell me which agents you used for this task.
 ```
 
 **Notes:** "Finally, the Doc Writer agent. Again using the `@agent` syntax for a standalone agent. It produces complete, ready-to-use markdown documentation — not an outline, but actual docs with curl examples."
